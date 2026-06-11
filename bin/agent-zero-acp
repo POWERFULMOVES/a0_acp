@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+find_a0_home() {
+  if [[ -n "${AGENT_ZERO_HOME:-}" ]]; then
+    cd "${AGENT_ZERO_HOME}" && pwd
+    return
+  fi
+
+  if [[ -f /a0/run_ui.py && -d /a0/helpers ]]; then
+    cd /a0 && pwd
+    return
+  fi
+
+  if [[ -f "${PWD}/run_ui.py" && -d "${PWD}/helpers" ]]; then
+    pwd
+    return
+  fi
+
+  case "${SCRIPT_DIR}" in
+    */usr/plugins/a0_acp/bin)
+      cd "${SCRIPT_DIR}/../../../.." && pwd
+      return
+      ;;
+  esac
+
+  return 1
+}
+
+if [[ -x /opt/venv-a0/bin/python && -d /a0/usr/plugins/a0_acp ]]; then
+  cd /a0
+  exec /opt/venv-a0/bin/python -m usr.plugins.a0_acp "$@"
+fi
+
+if [[ -n "${AGENT_ZERO_CONTAINER:-}" ]]; then
+  exec docker exec \
+    -i \
+    -w "${AGENT_ZERO_CONTAINER_WORKDIR:-/a0}" \
+    "${AGENT_ZERO_CONTAINER}" \
+    "${AGENT_ZERO_CONTAINER_PYTHON:-/opt/venv-a0/bin/python}" \
+    -m usr.plugins.a0_acp "$@"
+fi
+
+if [[ -n "${AGENT_ZERO_ACP_LOCAL:-}" ]]; then
+  a0_home="$(find_a0_home || true)"
+  if [[ -z "${a0_home}" ]]; then
+    echo "Set AGENT_ZERO_HOME to the Agent Zero root for local ACP development." >&2
+    exit 1
+  fi
+
+  python_bin="${AGENT_ZERO_PYTHON:-}"
+  if [[ -z "${python_bin}" ]]; then
+    if [[ -x "${a0_home}/.venv/bin/python" ]]; then
+      python_bin="${a0_home}/.venv/bin/python"
+    else
+      python_bin="python"
+    fi
+  fi
+
+  cd "${a0_home}"
+  exec "${python_bin}" -m usr.plugins.a0_acp "$@"
+fi
+
+cat >&2 <<'EOF'
+Agent Zero ACP needs the Agent Zero framework runtime.
+
+Run inside the container:
+  cd /a0 && /opt/venv-a0/bin/python -m usr.plugins.a0_acp
+
+Run from the host to Docker:
+  AGENT_ZERO_CONTAINER=<container-name-or-id> usr/plugins/a0_acp/bin/agent-zero-acp
+
+Run local development explicitly:
+  AGENT_ZERO_ACP_LOCAL=1 AGENT_ZERO_HOME=/path/to/agent-zero AGENT_ZERO_PYTHON=<framework-python> usr/plugins/a0_acp/bin/agent-zero-acp
+EOF
+exit 1

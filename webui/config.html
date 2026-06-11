@@ -1,0 +1,22 @@
+<div class="space-y-4">
+  <div>
+    <h3 class="text-lg font-semibold">Agent Client Protocol</h3>
+    <p class="text-sm opacity-70">Connect ACP-capable editors to Agent Zero.</p>
+  </div>
+  <div class="space-y-2">
+    <div class="text-xs font-semibold uppercase opacity-60">Host launcher</div>
+    <pre class="rounded bg-base-300 p-3 text-xs overflow-auto">AGENT_ZERO_CONTAINER=&lt;container-name-or-id&gt; usr/plugins/a0_acp/bin/agent-zero-acp</pre>
+  </div>
+  <div class="space-y-2">
+    <div class="text-xs font-semibold uppercase opacity-60">Docker exec</div>
+    <pre class="rounded bg-base-300 p-3 text-xs overflow-auto">docker exec -i -w /a0 &lt;container-name-or-id&gt; /opt/venv-a0/bin/python -m usr.plugins.a0_acp</pre>
+  </div>
+  <div class="space-y-2">
+    <div class="text-xs font-semibold uppercase opacity-60">Inside container</div>
+    <pre class="rounded bg-base-300 p-3 text-xs overflow-auto">cd /a0 &amp;&amp; /opt/venv-a0/bin/python -m usr.plugins.a0_acp</pre>
+  </div>
+  <div class="space-y-2">
+    <div class="text-xs font-semibold uppercase opacity-60">Local development</div>
+    <pre class="rounded bg-base-300 p-3 text-xs overflow-auto">AGENT_ZERO_ACP_LOCAL=1 AGENT_ZERO_HOME=/path/to/agent-zero AGENT_ZERO_PYTHON=/path/to/framework/python usr/plugins/a0_acp/bin/agent-zero-acp</pre>
+  </div>
+</div>

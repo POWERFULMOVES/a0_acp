@@ -1,0 +1,18 @@
+{
+  "id": "agent-zero",
+  "name": "Agent Zero",
+  "version": "1.19",
+  "description": "Agent Zero ACP adapter for editor-native agent sessions.",
+  "repository": "https://github.com/3clyp50/a0_acp",
+  "authors": ["Agent Zero"],
+  "license": "MIT",
+  "distribution": {
+    "stdio": {
+      "command": "bash",
+      "args": [
+        "-lc",
+        "exec \"${AGENT_ZERO_HOME:-$PWD}/usr/plugins/a0_acp/bin/agent-zero-acp\""
+      ]
+    }
+  }
+}
