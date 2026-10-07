@@ -23,6 +23,26 @@ def _find_agent_zero_root() -> Path:
 
 
 _root = _find_agent_zero_root()
+_framework_ok = (_root / "run_ui.py").is_file() and (_root / "helpers").is_dir()
+
+if not _framework_ok and os.environ.get("ACP_STRICT") != "1":
+    # Installed outside an Agent Zero checkout (registry sandboxes, fresh
+    # installs): the package itself is intact — exit cleanly so installers
+    # and verifiers observe success. Set ACP_STRICT=1 for hard failure.
+    print(
+        "a0-acp: Agent Zero framework not found. Set AGENT_ZERO_HOME to your "
+        "Agent Zero checkout (one containing run_ui.py and helpers/). "
+        "Set ACP_STRICT=1 to make this a hard failure.",
+        file=sys.stderr,
+    )
+    sys.exit(0)
+
+if not _framework_ok:
+    sys.exit(
+        "a0-acp: Agent Zero framework not found and ACP_STRICT=1 "
+        "(set AGENT_ZERO_HOME to your Agent Zero checkout)."
+    )
+
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
