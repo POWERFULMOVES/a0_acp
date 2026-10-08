@@ -13,6 +13,7 @@ keywords = ["acp", "agent", "agent-zero", "stdio"]
 
 [project.scripts]
 agent-zero-acp = "acp_adapter:main"
+a0-acp = "acp_adapter:main"
 
 [build-system]
 requires = ["hatchling"]
